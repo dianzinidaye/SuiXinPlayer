@@ -1,9 +1,6 @@
 package com.example.suixinplayer.liveDataBus.event;
 
-import java.io.Serializable;
-
-public class PlayEvet implements Serializable {
-
+public class UpDateUI {
     //0代表免费
     public   int isFree = 0;
     public String hash ;

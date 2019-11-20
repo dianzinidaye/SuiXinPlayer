@@ -3,7 +3,6 @@ package com.example.suixinplayer.ui.activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
@@ -11,25 +10,33 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
-import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
 
 import com.example.suixinplayer.R;
 import com.example.suixinplayer.base.BaseActivity;
+import com.example.suixinplayer.bean.SongInMainActivityBean;
 import com.example.suixinplayer.liveDataBus.event.PlayEvet;
+import com.example.suixinplayer.liveDataBus.event.UpDateUI;
 import com.example.suixinplayer.service.MusicPlayService;
 import com.jeremyliao.liveeventbus.LiveEventBus;
+
+import java.util.Observable;
+
 
 public class PlayActivity extends BaseActivity implements View.OnClickListener {
     private ImageView stop_play;
     private ImageView pre;
     private ImageView next;
     String TAG = "TAG";
-   // boolean isPlaying = false;
+    // boolean isPlaying = false;
     boolean isLoveSong;
     private ImageView back;
     private PlayEvet playEvet;
     private MusicPlayService.MyBinder binder;
-    private TextView songName,author;
+    private TextView songName, author;
+    private SongInMainActivityBean mSongInMainActivityBean;
+    private Observer<UpDateUI> observer;
+
 
     @Override
     protected void onRestart() {
@@ -37,7 +44,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
         if (binder.getPlayState()) {
             Log.i(TAG, "onRestart: 在播放");
             stop_play.setImageResource(R.drawable.ic_pause_60dp);
-        }else {
+        } else {
             Log.i(TAG, "onRestart: 不播放");
             stop_play.setImageResource(R.drawable.ic_play_60dp);
         }
@@ -57,7 +64,9 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected void initView() {
-        playEvet = (PlayEvet) getIntent().getSerializableExtra("FActivity");
+        Intent intent = getIntent();
+        mSongInMainActivityBean = (SongInMainActivityBean) intent.getSerializableExtra("FMainActivity");
+        playEvet = mSongInMainActivityBean.playList.get(mSongInMainActivityBean.position);
         stop_play = findViewById(R.id.stop_play);
         pre = findViewById(R.id.pre);
         next = findViewById(R.id.next);
@@ -73,7 +82,16 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
         if (playEvet != null) {
             songName.setText(playEvet.songName);
             author.setText(playEvet.author);
-        }
+        } else Log.i(TAG, "initView: playEvet 等于空");
+        updateUi();
+    }
+
+    private void updateUi() {
+        observer = upDateUI -> {
+           songName.setText(upDateUI.songName);
+           author.setText(upDateUI.author);
+       };
+        LiveEventBus.get("UpDateUI", UpDateUI.class).observeStickyForever(observer);
     }
 
     @Override
@@ -84,10 +102,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
             public void onServiceConnected(ComponentName name, IBinder service) {
                 binder = (MusicPlayService.MyBinder) service;
                 if (binder.getPlayState()) {
-                    Log.i(TAG, "onRestart: 在播放");
                     stop_play.setImageResource(R.drawable.ic_pause_60dp);
-                }else {
-                    Log.i(TAG, "onRestart: 不播放");
+                } else {
                     stop_play.setImageResource(R.drawable.ic_play_60dp);
                 }
             }
@@ -99,13 +115,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
         };
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
 
-        LiveEventBus.get("Play", PlayEvet.class).observeForever(new androidx.lifecycle.Observer<PlayEvet>() {
-            @Override
-            public void onChanged(PlayEvet playEvet) {
-                songName.setText(playEvet.songName);
-                author.setText(playEvet.author);
-            }
-        });
     }
 
     @Override
@@ -115,26 +124,37 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
                 finish();
                 break;
             case R.id.pre:
+                if (mSongInMainActivityBean.position >0) {
+                    mSongInMainActivityBean.position = --mSongInMainActivityBean.position;
+                    binder.hash2Url(mSongInMainActivityBean.playList.get(mSongInMainActivityBean.position));
+                }
                 Log.i(TAG, "onClick: pre");
                 break;
             case R.id.stop_play:
                 if (binder.getPlayState()) {
                     stop_play.setImageResource(R.drawable.ic_play_60dp);
-
-                    LiveEventBus.get("Play", PlayEvet.class).post(playEvet);
-                   // isPlaying = false;
-                    playEvet.paly = false;
+                    binder.getMediaPlayer().pause();
                 } else {
                     stop_play.setImageResource(R.drawable.ic_pause_60dp);
-                    LiveEventBus.get("Play", PlayEvet.class).post(playEvet);
-                    playEvet.paly = true;
+                    binder.getMediaPlayer().start();
                 }
-                Log.i(TAG, "onClick: stop_play");
                 break;
             case R.id.next:
                 Log.i(TAG, "onClick: next");
+                if (mSongInMainActivityBean.position < mSongInMainActivityBean.playList.size()) {
+                    mSongInMainActivityBean.position = ++mSongInMainActivityBean.position;
+                    binder.hash2Url(mSongInMainActivityBean.playList.get(mSongInMainActivityBean.position));
+                }
+
                 break;
         }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LiveEventBus.get("UpDateUI", UpDateUI.class).removeObserver(observer);
 
     }
 }

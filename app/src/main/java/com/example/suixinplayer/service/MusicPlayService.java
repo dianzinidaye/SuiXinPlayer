@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import com.example.suixinplayer.app.App;
 import com.example.suixinplayer.bean.SongBean;
 import com.example.suixinplayer.liveDataBus.event.PlayEvet;
+import com.example.suixinplayer.liveDataBus.event.UpDateUI;
 import com.example.suixinplayer.network.ApiSongDetailService;
 import com.example.suixinplayer.other.videocache.CacheListener;
 import com.example.suixinplayer.uitli.SharPUtil;
@@ -36,6 +37,7 @@ public class MusicPlayService extends Service {
     MediaPlayer mMediaPlayer = new MediaPlayer();
     private String preHash = "";
     private String playUrl;
+
 
     @Nullable
     @Override
@@ -64,21 +66,15 @@ public class MusicPlayService extends Service {
             LiveEventBus
                     .get("Play", PlayEvet.class)
                     .observeForever(s -> {
-                        Log.i("xiaohuge", "getMessege: 收到一条信息 " + s.paly + "  " + s.hash + "  preHash" + preHash);
                         if (preHash.equals(s.hash)) {
-                            Log.i("TAG", "getMessege:  preHash == s.hash");
                             if (mMediaPlayer.isPlaying()) {
                                 mMediaPlayer.pause();
-                                Log.i("xiaohuge", "getMessege: 收到一条信息    mMediaPlayer.pause");
                             } else {
                                 mMediaPlayer.start();
-                                Log.i("xiaohuge", "getMessege: 收到一条信息    mMediaPlayer.start");
                             }
                         } else {
-                            Log.i("xiaohuge", "getMessege:  preHash != s.hash");
-                            hash2Url(s.hash);
-                            preHash = s.hash;
-                            //  SharPUtil.putString(getApplication(), "LASTSONG",s.songName+"-"+s.author);
+                            hash2Url(s);
+
                         }
 
                     });
@@ -86,7 +82,18 @@ public class MusicPlayService extends Service {
 
 
         //用hash取获取包含歌词和播放Url的SongBean对象(还有付费信息和音质信息)  发送播放事件给service
-        private void hash2Url(String hashString) {
+        public void hash2Url(PlayEvet playEvet) {
+            if (preHash.equals(playEvet.hash)) {
+                return;
+            }
+            SharPUtil.putString(getApplication(), "LASTSONG",playEvet.songName+"-"+playEvet.author);
+            UpDateUI upDateUI = new UpDateUI();
+            upDateUI.author = playEvet.author;
+            upDateUI.hash = playEvet.hash;
+            upDateUI.isFree = playEvet.isFree;
+            upDateUI.songName = playEvet.songName;
+            LiveEventBus.get("UpDateUI", UpDateUI.class).post(upDateUI);
+            preHash = playEvet.hash;
             //http://www.kugou.com/yy/index.php?r=play/getdata&hash=79b77708dca79378af538f9a518f1b76/
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl("https://www.kugou.com/")//基础URL 建议以 / 结尾
@@ -96,7 +103,7 @@ public class MusicPlayService extends Service {
                     .build();
             ArrayMap<String, String> headMap = new ArrayMap<>();
             headMap.put("r", "play/getdata");
-            headMap.put("hash", hashString);
+            headMap.put("hash", playEvet.hash);
             ApiSongDetailService rxjavaService = retrofit.create(ApiSongDetailService.class);
             rxjavaService.getListBean(headMap)
                     .subscribeOn(Schedulers.io())//IO线程加载数据

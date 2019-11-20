@@ -45,7 +45,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class SearchFragment extends Fragment implements HistoryRecyclerViewSelectOnclickListener, View.OnClickListener {
 
-    private List<SongSearchForResultListBean.DataBean.InfoBean> list  = new ArrayList<>();
+    private List<PlayEvet> playEvetListlist = new ArrayList<>();
     private EditText etv_search;
     private RecyclerView mRecyclerView;
     private SearchRecyclerVierAdapter mSearchRecyclerVierAdapter;
@@ -81,7 +81,7 @@ public class SearchFragment extends Fragment implements HistoryRecyclerViewSelec
         mRecyclerView = getView().findViewById(R.id.search_recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
-        mSearchRecyclerVierAdapter = new SearchRecyclerVierAdapter(list, this,getContext());
+        mSearchRecyclerVierAdapter = new SearchRecyclerVierAdapter(this, getContext());
         mRecyclerView.setAdapter(mSearchRecyclerVierAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
     }
@@ -135,8 +135,21 @@ public class SearchFragment extends Fragment implements HistoryRecyclerViewSelec
                     @Override
                     public void onNext(SongSearchForResultListBean songSearchForResultListBean) {
                         mSearchRecyclerVierAdapter.list = songSearchForResultListBean.getData().getInfo();
-                        list = songSearchForResultListBean.getData().getInfo();
                         mSearchRecyclerVierAdapter.notifyDataSetChanged();
+                        for (SongSearchForResultListBean.DataBean.InfoBean infobean : songSearchForResultListBean.getData().getInfo()) {
+                            PlayEvet playEvent = new PlayEvet();
+                            playEvent.hash = infobean.getHash();
+                            playEvent.songName = infobean.getSongname();
+                            playEvent.author = infobean.getSingername();
+                            if (infobean.getTrans_param().getHash_offset() == null) {
+                                playEvent.isFree = 0;
+                            } else {
+                                playEvent.isFree = 1;
+                            }
+                            playEvetListlist.add(playEvent);
+
+                        }
+                        model.changePlayList(playEvetListlist);
                     }
 
                     @Override
@@ -153,26 +166,17 @@ public class SearchFragment extends Fragment implements HistoryRecyclerViewSelec
 
 
     void commonPart(int position) {
-        if (list.get(position).getHash() != null) {
-                //代码的公共部分
-            model.getPlayEver().hash = list.get(position).getHash();
-            model.getPlayEver().songName = list.get(position).getSongname();
-            model.getPlayEver().author = list.get(position).getSingername();
-            model.getPlayEver().paly = true;
-            model.setPlayEver(model.getPlayEver());
-            Log.i("TAG", "commonPart: hash="+list.get(position).getHash());
+        if (playEvetListlist != null) {
+            //代码的公共部分
             LiveEventBus.get("Play", PlayEvet.class)
-                    .post(model.getPlayEver());
+                    .post(playEvetListlist.get(position));
+            model.setPosition(position);
 
-            mSongDB.setHash(list.get(position).getHash());
-            mSongDB.setAuthor(list.get(position).getSingername());
-            if (list.get(position).getTrans_param().getHash_offset()==null){
-            mSongDB.setIs_free_part(0);
-            }else {
-                mSongDB.setIs_free_part(1);
-            }
-            mSongDB.setSongName(list.get(position).getSongname());
-            DBUtil.insert(db,"最近播放", mSongDB);
+            mSongDB.setHash(playEvetListlist.get(position).hash);
+            mSongDB.setAuthor(playEvetListlist.get(position).author);
+            mSongDB.setIs_free_part(playEvetListlist.get(position).isFree);
+            mSongDB.setSongName(playEvetListlist.get(position).songName);
+            DBUtil.insert(db, "最近播放", mSongDB);
 
         }
     }

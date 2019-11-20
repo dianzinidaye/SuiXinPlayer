@@ -21,26 +21,23 @@ public class MainActivityViewModel extends ViewModel {
         return playData;
     }
 
-    public void setSongSheetList(String songSheetName, List<String> songSheetList) {
-        if (playData.getValue().map.containsKey(songSheetName)) {
-            playData.getValue().map.remove(songSheetName);
-            playData.getValue().map.put(songSheetName, songSheetList);
-            playData.setValue(playData.getValue());
-        }
-
+    public void add2PlayList(PlayEvet playEvet) {
+        playData.getValue().playList.add(playEvet);
+        playData.setValue(playData.getValue());
     }
 
-    public Map getSongSheetList() {
-        return playData.getValue().map;
+    public void delFromPlayList(int position) {
+        playData.getValue().playList.remove(position);
+        playData.setValue(playData.getValue());
     }
 
-
-
-    public PlayEvet getPlayEver(){
-        return playData.getValue().playEvet;
+    public void changePlayList(List<PlayEvet> list){
+        playData.getValue().playList = list;
+        playData.setValue(playData.getValue());
     }
-    public void setPlayEver(PlayEvet playEvet){
-        playData.getValue().playEvet = playEvet;
+
+    public void setPosition(int position){
+        playData.getValue().position = position;
         playData.setValue(playData.getValue());
     }
 

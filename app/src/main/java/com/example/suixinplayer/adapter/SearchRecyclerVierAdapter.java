@@ -26,6 +26,7 @@ import com.example.suixinplayer.callback.HistoryRecyclerViewSelectOnclickListene
 import com.example.suixinplayer.liveDataBus.event.CanclePupUpWdEvent;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -43,8 +44,8 @@ public class SearchRecyclerVierAdapter extends RecyclerView.Adapter<SearchRecycl
     private Context mContext;
 
 
-    public SearchRecyclerVierAdapter(List<SongSearchForResultListBean.DataBean.InfoBean> list, HistoryRecyclerViewSelectOnclickListener mHistoryRecyclerViewSelectOnclickListener, Context context) {
-        this.list = list;
+    public SearchRecyclerVierAdapter( HistoryRecyclerViewSelectOnclickListener mHistoryRecyclerViewSelectOnclickListener, Context context) {
+        this.list = new ArrayList<>();
         mContext = context;
         this.mHistoryRecyclerViewSelectOnclickListener = mHistoryRecyclerViewSelectOnclickListener;
         LiveEventBus

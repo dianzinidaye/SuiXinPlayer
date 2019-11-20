@@ -1,0 +1,53 @@
+package com.example.suixinplayer.uitli;
+
+import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
+import android.os.Build;
+import android.widget.Toast;
+
+import androidx.fragment.app.FragmentActivity;
+
+import com.example.suixinplayer.ui.activity.MainActivity;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+
+public class PermissionUtil {
+
+    public static void rxPermissionTest(FragmentActivity context) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            RxPermissions rxPermissions = new RxPermissions(context);
+            rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)
+                    .subscribe(new Observer<Boolean>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(Boolean aBoolean) {
+                            if (aBoolean) {
+
+                            } else {
+                                //只有用户拒绝开启权限，且选了不再提示时，才会走这里，否则会一直请求开启
+                                Toast.makeText(context, "主人，我被禁止啦，去设置权限设置那把我打开哟", Toast.LENGTH_LONG)
+                                        .show();
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+        }
+    }
+}

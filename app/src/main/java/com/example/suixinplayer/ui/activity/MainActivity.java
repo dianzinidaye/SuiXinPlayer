@@ -1,22 +1,17 @@
 package com.example.suixinplayer.ui.activity;
 
-import android.Manifest;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.MediaPlayer;
-import android.os.Build;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -32,19 +27,18 @@ import com.example.suixinplayer.callback.ViewPageSelectCallback;
 import com.example.suixinplayer.db.DBUtil;
 import com.example.suixinplayer.listener.ViewPagerOnPageChangeListener;
 import com.example.suixinplayer.liveDataBus.MainActivityViewModel;
-import com.example.suixinplayer.liveDataBus.event.PlayEvet;
+import com.example.suixinplayer.liveDataBus.event.UpDateUI;
 import com.example.suixinplayer.service.MusicPlayService;
 import com.example.suixinplayer.ui.search.SearchFragment;
+import com.example.suixinplayer.uitli.PermissionUtil;
 import com.example.suixinplayer.uitli.SharPUtil;
 import com.example.suixinplayer.widget.MyCircleImageView;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.roughike.bottombar.BottomBar;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
+import androidx.lifecycle.Observer;
 
-public class MainActivity extends BaseActivity implements ViewPageSelectCallback, View.OnClickListener {
+public class MainActivity extends BaseActivity implements ViewPageSelectCallback, View.OnClickListener, MediaPlayer.OnBufferingUpdateListener {
 
     private MyCircleImageView mCircleImageView;
     private ViewPager viewPager;
@@ -60,7 +54,8 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
     private MainActivityViewModel model;
     private SeekBar seekBar;
     private ConstraintLayout mConstraintLayout;
-    private TextView songName,author;
+    private TextView songName, author;
+    private Observer<UpDateUI> observer;
 
 
     @Override
@@ -79,7 +74,8 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
             SharPUtil.putBoolean(this, "IsFirst", false);
         }
 
-        rxPermissionTest();
+       // rxPermissionTest();
+        PermissionUtil.rxPermissionTest(this);
         mCircleImageView = findViewById(R.id.profile_image);
         viewPager = findViewById(R.id.viewPager);
         bottomBar = findViewById(R.id.bottomBar);
@@ -92,6 +88,7 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
         author = findViewById(R.id.textView6);
         bottomBar.setDefaultTabPosition(0);
 
+
     }
 
     @Override
@@ -100,30 +97,20 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
         SongInMainActivityBean mSongInMainActivityBean = new SongInMainActivityBean();
         model.getData().setValue(mSongInMainActivityBean);
         model.getData().observe(this, users -> {
-            songName.setText(model.getPlayEver().songName);
-            author.setText(model.getPlayEver().author);
-            if (model.getPlayEver().paly == true) {
-                play_or_Stop.setImageResource(R.drawable.ic_mainactivity_stop);
-                Log.i("TAG", "initData: model.getPlayEver().paly==true");
-            } else {
-                play_or_Stop.setImageResource(R.drawable.ic_mainactivity_play);
-                Log.i("TAG", "initData: model.getPlayEver().paly==false");
-            }
+
 
         });
+
+        /*
+         * 绑定service
+         * */
         Intent intent = new Intent(this, MusicPlayService.class);
         ServiceConnection serviceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 binder = (MusicPlayService.MyBinder) service;
-             MediaPlayer mediaPlayer = binder.getMediaPlayer();
-             mediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
-                 @Override
-                 public void onBufferingUpdate(MediaPlayer mp, int percent) {
-                    // seekBar.set
-                 }
-             });
-
+                MediaPlayer mediaPlayer = binder.getMediaPlayer();
+                mediaPlayer.setOnBufferingUpdateListener(MainActivity.this);
             }
 
             @Override
@@ -132,14 +119,8 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
             }
         };
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+        updateUi();
         dealView();
-/*        LiveEventBus.get("Play", PlayEvet.class).observeForever(new androidx.lifecycle.Observer<PlayEvet>() {
-            @Override
-            public void onChanged(PlayEvet playEvet) {
-                songName.setText(playEvet.songName);
-                author.setText(playEvet.author);
-            }
-        });*/
     }
 
     /*
@@ -194,52 +175,24 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
             moveTaskToBack(true);//退到后台,不退出程序
     }
 
-    //权限申请
-    private void rxPermissionTest() {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            RxPermissions rxPermissions = new RxPermissions(this);
-            rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)
-                    .subscribe(new Observer<Boolean>() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
-
-                        }
-
-                        @Override
-                        public void onNext(Boolean aBoolean) {
-                            if (aBoolean) {
-
-                            } else {
-                                //只有用户拒绝开启权限，且选了不再提示时，才会走这里，否则会一直请求开启
-                                Toast.makeText(MainActivity.this, "主人，我被禁止啦，去设置权限设置那把我打开哟", Toast.LENGTH_LONG)
-                                        .show();
-                            }
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-
-                        }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    });
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i("TAG", "onResume:  "+model.getData().getValue().position);
+        if (binder != null) {
+            Log.i("TAG", "onResume:  不空");
+            if (binder.getPlayState()) {
+                play_or_Stop.setImageResource(R.drawable.ic_mainactivity_stop);
+            } else {
+                play_or_Stop.setImageResource(R.drawable.ic_mainactivity_play);
+            }
         }
     }
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
-            model.getPlayEver().paly = binder.getPlayState();
-        if (binder.getPlayState()) {
-            play_or_Stop.setImageResource(R.drawable.ic_mainactivity_stop);
-        }else {
-            play_or_Stop.setImageResource(R.drawable.ic_mainactivity_play);
-        }
-       // model.setPlayEver(model.getPlayEver());
+    protected void onDestroy() {
+        super.onDestroy();
+        LiveEventBus.get("UpDateUI", UpDateUI.class).removeObserver(observer);
     }
 
     @Override
@@ -250,20 +203,13 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
                         .add(R.id.mainlayout, new SearchFragment(), previousFragment).commitNow();
                 break;
             case R.id.imageButton_playOrStop:
-                model.getPlayEver().paly = binder.getPlayState();
-                if (model.getPlayEver().paly == true) {
-                    LiveEventBus.get("Play", PlayEvet.class).post(model.getPlayEver());
-                    model.getPlayEver().paly = false;
-                    model.setPlayEver(model.getPlayEver());
 
-
+                if (binder.getPlayState()) {
+                    play_or_Stop.setImageResource(R.drawable.ic_mainactivity_play);
+                    binder.getMediaPlayer().pause();
                 } else {
-                    if (model.getPlayEver().hash != null) {
-                        LiveEventBus.get("Play", PlayEvet.class).post(model.getPlayEver());
-                        model.getPlayEver().paly = true;
-                        model.setPlayEver(model.getPlayEver());
-
-                    }
+                    play_or_Stop.setImageResource(R.drawable.ic_mainactivity_stop);
+                    binder.getMediaPlayer().start();
                 }
 
                 break;
@@ -271,15 +217,36 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
 
                 break;
             case R.id.bottom:
-                Log.i("TAG", "onClick: 点击了底部bottom");
                 Intent intent = new Intent(this, PlayActivity.class);
-                if (model.getPlayEver() != null) {
-                    intent.putExtra("FActivity", model.getPlayEver());
-                    startActivity(intent);
+                if (model.getData().getValue() != null) {
+                    if (model.getData().getValue()!=null){
+                        intent.putExtra("FMainActivity", model.getData().getValue());
+                        startActivity(intent);
+                    }
+
                 } else Log.i("TAG", "onClick: model.getPlayEver()为空");
 
                 break;
         }
 
     }
+    private void updateUi() {
+         observer = upDateUI -> {
+             songName.setText(upDateUI.songName);
+             author.setText(upDateUI.author);
+             Log.i("TAG", "onChanged:  不空");
+             play_or_Stop.setImageResource(R.drawable.ic_mainactivity_stop);
+         };
+        LiveEventBus.get("UpDateUI", UpDateUI.class).observeStickyForever(observer);
+    }
+
+    /*
+     * mediapalyer缓存,更新seekbar
+     * */
+    @Override
+    public void onBufferingUpdate(MediaPlayer mp, int percent) {
+
+    }
+
+
 }
