@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#0ff</color>
+    <color name="colorPrimaryDark">#f00</color>
+    <color name="colorAccent">#038939</color>
+    <color name="search_button">#7CCD7C</color>
+<!--pobupwindow-->
+    <color name="line_default">#1E000000</color>
+    <color name="white">#ffffffff</color>
+    <color name="gray">#FFFAFA</color>
+    <color name="press">#CFCFCF</color>
+    <color name="edging">#C2C2C2</color>
+    <color name="playactivitytop">#F666</color>
+
+
+</resources>
+<!--
+    系统默认的颜色
+    <color name="colorPrimary">#0ff</color>
+    <color name="colorPrimaryDark">#f00</color>
+    <color name="colorAccent">#038939</color>
+    <color name="search_button">#7CCD7C</color>
+-->

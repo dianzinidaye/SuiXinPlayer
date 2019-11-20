@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="@color/white"
+    android:layout_height="match_parent">
+   <!-- <TextView
+        android:id="@+id/text1"
+        android:text="标准音质"
+        android:textColor="#000"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:textSize="30dp"
+        android:gravity="center"
+        android:clickable="true"
+        />-->
+   <androidx.recyclerview.widget.RecyclerView
+       android:id="@+id/recyclerView"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"/>
+</LinearLayout>
