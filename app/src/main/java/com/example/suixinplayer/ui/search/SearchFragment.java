@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.suixinplayer.R;
 import com.example.suixinplayer.adapter.SearchRecyclerVierAdapter;
+import com.example.suixinplayer.app.App;
 import com.example.suixinplayer.bean.SongSearchForResultListBean;
 import com.example.suixinplayer.callback.HistoryRecyclerViewSelectOnclickListener;
 import com.example.suixinplayer.db.DBUtil;
@@ -49,7 +50,6 @@ public class SearchFragment extends Fragment implements HistoryRecyclerViewSelec
     private EditText etv_search;
     private RecyclerView mRecyclerView;
     private SearchRecyclerVierAdapter mSearchRecyclerVierAdapter;
-    private MainActivityViewModel model;
     private SQLiteDatabase db;
     private SongDB mSongDB = new SongDB();
 
@@ -61,8 +61,7 @@ public class SearchFragment extends Fragment implements HistoryRecyclerViewSelec
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        model = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
-        db = DBUtil.creatDatabase("歌单", getContext());
+        db = DBUtil.getDatabase( getContext());
     }
 
     @Override
@@ -149,7 +148,7 @@ public class SearchFragment extends Fragment implements HistoryRecyclerViewSelec
                             playEvetListlist.add(playEvent);
 
                         }
-                        model.changePlayList(playEvetListlist);
+                       // model.changePlayList(playEvetListlist);
                     }
 
                     @Override
@@ -170,12 +169,12 @@ public class SearchFragment extends Fragment implements HistoryRecyclerViewSelec
             //代码的公共部分
             LiveEventBus.get("Play", PlayEvet.class)
                     .post(playEvetListlist.get(position));
-            model.setPosition(position);
 
             mSongDB.setHash(playEvetListlist.get(position).hash);
             mSongDB.setAuthor(playEvetListlist.get(position).author);
             mSongDB.setIs_free_part(playEvetListlist.get(position).isFree);
             mSongDB.setSongName(playEvetListlist.get(position).songName);
+            App.songInMainActivityBean.playList.add(playEvetListlist.get(position));
             DBUtil.insert(db, "最近播放", mSongDB);
 
         }

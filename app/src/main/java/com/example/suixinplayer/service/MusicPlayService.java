@@ -37,6 +37,7 @@ public class MusicPlayService extends Service {
     MediaPlayer mMediaPlayer = new MediaPlayer();
     private String preHash = "";
     private String playUrl;
+    private String imgUri;
 
 
     @Nullable
@@ -87,12 +88,7 @@ public class MusicPlayService extends Service {
                 return;
             }
             SharPUtil.putString(getApplication(), "LASTSONG",playEvet.songName+"-"+playEvet.author);
-            UpDateUI upDateUI = new UpDateUI();
-            upDateUI.author = playEvet.author;
-            upDateUI.hash = playEvet.hash;
-            upDateUI.isFree = playEvet.isFree;
-            upDateUI.songName = playEvet.songName;
-            LiveEventBus.get("UpDateUI", UpDateUI.class).post(upDateUI);
+
             preHash = playEvet.hash;
             //http://www.kugou.com/yy/index.php?r=play/getdata&hash=79b77708dca79378af538f9a518f1b76/
             Retrofit retrofit = new Retrofit.Builder()
@@ -119,6 +115,7 @@ public class MusicPlayService extends Service {
                             Log.i("SearchFragment", "onNext: " + songBean.getData().getSong_name() + " " + songBean.getData().getAudio_name());
                             //保存播放地址
                             playUrl = songBean.getData().getPlay_url();
+                            imgUri = songBean.getData().getImg();
                           /*  songName = songBean.getData().getSong_name();
                             author = songBean.getData().getAuthor_name();
                             is_free_part = songBean.getData().getIs_free_part();
@@ -128,24 +125,21 @@ public class MusicPlayService extends Service {
                         @Override
                         public void onError(Throwable e) {
                             //如果上次有播放过,则在断网的时候播放本地缓存的
-                            commonPart(playUrl);
+                            play(playUrl,playEvet,imgUri);
                             Log.i("SearchFragment", "onError");
                         }
 
                         @Override
                         public void onComplete() {
-                            commonPart(playUrl);
+                            play(playUrl,playEvet,imgUri);
                             Log.i("SearchFragment", "onComplete");
                         }
                     });
         }
 
-        private void commonPart(String url) {
-            play(url);
-        }
 
 
-        public void play(String url) {
+        public void play(String url,PlayEvet playEvet,String imgUri) {
             mMediaPlayer.reset();
             Uri uri = Uri.parse(url);
             try {
@@ -154,9 +148,17 @@ public class MusicPlayService extends Service {
                 mMediaPlayer.setOnPreparedListener(mp -> {
                     Log.d("TAG", "onPrepared: 播放 " + mp.getDuration());
                     mp.start();
+                    UpDateUI upDateUI = new UpDateUI();
+                    upDateUI.author = playEvet.author;
+                    upDateUI.hash = playEvet.hash;
+                    upDateUI.isFree = playEvet.isFree;
+                    upDateUI.songName = playEvet.songName;
+                    upDateUI.duration = mp.getDuration();
+                    upDateUI.imaUri = imgUri;
+                    LiveEventBus.get("UpDateUI", UpDateUI.class).post(upDateUI);
                 });
                 mMediaPlayer.setOnCompletionListener(mp -> {
-                    play(url);
+                    play(url,playEvet,imgUri);
 
                 });
 

@@ -65,7 +65,7 @@ public class SearchRecyclerVierAdapter extends RecyclerView.Adapter<SearchRecycl
                     RecyclerView recyclerView = popRootView.findViewById(R.id.recyclerView);
                     recyclerView.setLayoutManager(layoutManager);
                     recyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
-                    recyclerView.setAdapter(new PopUpWindowRecyclerViewSongListAdapter(context,s.infoBean));
+                    recyclerView.setAdapter(new PopUpWindowRecyclerViewSongListAdapter(context,s.infoBean,popupWindowSongList));
                     // 设置背景
                     popupWindowSongList.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
 
@@ -93,7 +93,6 @@ public class SearchRecyclerVierAdapter extends RecyclerView.Adapter<SearchRecycl
             mTextViewSong = view.findViewById(R.id.tv_item_history_song);
             mTextViewSinger = view.findViewById(R.id.tv_item_history_singer);
             linearLayout = (LinearLayout) view;
-            Log.i("TAG", "VH: ");
         }
 
     }
@@ -124,7 +123,6 @@ public class SearchRecyclerVierAdapter extends RecyclerView.Adapter<SearchRecycl
         holder.linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("TAG", "OnClick: ");
                 mHistoryRecyclerViewSelectOnclickListener.deal(position, v);
             }
         });
@@ -136,7 +134,6 @@ public class SearchRecyclerVierAdapter extends RecyclerView.Adapter<SearchRecycl
         holder.linearLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Log.i("TAG", "onTouch: ");
                 x = event.getRawX();
                 y = event.getRawY();
                 return false;
@@ -152,7 +149,6 @@ public class SearchRecyclerVierAdapter extends RecyclerView.Adapter<SearchRecycl
 
             @Override
             public boolean onLongClick(View v) {
-                Log.i("TAG", "onLongClick: ");
 
                 LayoutInflater inflater = (LayoutInflater) v.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View popRootView = inflater.inflate(R.layout.popupwindow, null, false);//引入弹窗布局

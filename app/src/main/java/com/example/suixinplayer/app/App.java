@@ -1,19 +1,26 @@
 package com.example.suixinplayer.app;
 
 
+import android.app.Application;
 import android.content.Context;
 
 import com.example.suixinplayer.base.ActivityManager;
+import com.example.suixinplayer.bean.SongInMainActivityBean;
+import com.example.suixinplayer.db.DBUtil;
+import com.example.suixinplayer.liveDataBus.event.PlayEvet;
 import com.example.suixinplayer.other.videocache.HttpProxyCacheServer;
 import com.example.suixinplayer.uitli.AndroidVideoCacheFileNameGenerator;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.litepal.LitePalApplication;
 
+import java.util.List;
 
-public class App extends LitePalApplication {
+
+public class App extends Application {
     public static ActivityManager mActivityManager = ActivityManager.getInstence();
-    private static Context context;
+    public static Context context;
+    public static SongInMainActivityBean songInMainActivityBean = new SongInMainActivityBean();
 
 
   /*  private HttpProxyCacheServer proxy;
@@ -40,6 +47,7 @@ public class App extends LitePalApplication {
         super.onCreate();
         context = getApplicationContext();
         LiveEventBus.config().autoClear(true);
+        songInMainActivityBean.playList = DBUtil.queryALL(DBUtil.getDatabase( this), "最近播放");
 
     }
 

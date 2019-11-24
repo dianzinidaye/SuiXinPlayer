@@ -6,4 +6,6 @@ public class UpDateUI {
     public String hash ;
     public String songName;
     public String author;
+    public int duration;
+    public String imaUri;
 }

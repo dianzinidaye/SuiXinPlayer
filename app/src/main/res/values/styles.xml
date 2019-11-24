@@ -25,12 +25,20 @@
     </style>
 
     <style name="ApplicationTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
-    <item name="colorPrimary">@color/playactivitytop</item>
-    <!--状态栏颜色-->
-    <item name="colorPrimaryDark">@color/playactivitytop</item>
-    <!--控制各个控件被选中时的颜色-->
-    <item name="colorAccent">@color/colorAccent</item>
-</style>
+        <item name="colorPrimary">@color/playactivitytop</item>
+        <!--状态栏颜色-->
+        <item name="colorPrimaryDark">@color/playactivitytop</item>
+        <!--控制各个控件被选中时的颜色-->
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+<!--
+popupWindow动画的style
+-->
+    <style name="popwin_anim_style" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/pop_enter_anim</item>
+        <item name="android:windowExitAnimation">@anim/pop_exit_anim</item>
+    </style>
 
 
 

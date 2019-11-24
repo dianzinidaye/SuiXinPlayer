@@ -9,6 +9,10 @@ import androidx.core.view.ViewPropertyAnimatorListener;
 
 import com.example.suixinplayer.R;
 import com.example.suixinplayer.base.BaseActivity;
+import com.example.suixinplayer.db.DBUtil;
+import com.example.suixinplayer.liveDataBus.event.PlayEvet;
+
+import java.util.List;
 
 import butterknife.BindView;
 
@@ -29,6 +33,7 @@ public class WelcomeActivity extends BaseActivity implements ViewPropertyAnimato
                  .scaleX(1.0f)
                  .setListener(this)
                  .setDuration(2000);//不用加.start()也可以自己开始
+
     }
 
     @Override
@@ -38,7 +43,8 @@ public class WelcomeActivity extends BaseActivity implements ViewPropertyAnimato
 
     @Override
     public void onAnimationEnd(View view) {
-        startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
+        Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+        startActivity(intent);
     }
 
     @Override

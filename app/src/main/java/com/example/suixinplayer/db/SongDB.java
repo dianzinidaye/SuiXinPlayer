@@ -2,7 +2,7 @@ package com.example.suixinplayer.db;
 
 import org.litepal.crud.LitePalSupport;
 
-public class SongDB extends LitePalSupport {
+public class SongDB  {
     //private String url;
     private String songName;
     private String author;

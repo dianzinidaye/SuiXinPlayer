@@ -47,7 +47,12 @@
 
         <SeekBar
             android:id="@+id/seekBar5"
-            style="@style/Widget.AppCompat.SeekBar"
+            android:maxHeight="8dp"
+            android:minHeight="8dp"
+
+            android:progressDrawable="@drawable/shape_seekbar_bg"
+            android:splitTrack="false"
+
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:thumb="@drawable/shape_seekball"

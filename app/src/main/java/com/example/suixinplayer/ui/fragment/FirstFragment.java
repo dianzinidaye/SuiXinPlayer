@@ -5,17 +5,22 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.example.suixinplayer.R;
 import com.example.suixinplayer.adapter.SongListExtendableListViewAdapter;
+import com.example.suixinplayer.liveDataBus.event.AddSong;
+import com.example.suixinplayer.widget.CustomBaseDialog;
 import com.example.suixinplayer.widget.SongListExpandableListView;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,9 +29,11 @@ public class FirstFragment extends Fragment {
 
    private String TAG = "TAG";
     private SongListExpandableListView expandableListView;
+    private SongListExtendableListViewAdapter songListExtendableListViewAdapter;
 
     public FirstFragment() {
         // Required empty public constructor
+
     }
 
 
@@ -44,21 +51,8 @@ public class FirstFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         Log.i(TAG, "FirstFragment onActivityCreated:  "+R.id.textView);
         expandableListView = getView().findViewById(R.id.expandable_listView);
-        SongListExtendableListViewAdapter songListExtendableListViewAdapter = new SongListExtendableListViewAdapter();
+         songListExtendableListViewAdapter = new SongListExtendableListViewAdapter(getActivity());
         expandableListView.setAdapter(songListExtendableListViewAdapter);
-        //设置分组的监听
-        expandableListView.setOnGroupClickListener((parent, v, groupPosition, id) -> {
-            //Toast.makeText(getActivity(),songListExtendableListViewAdapter.groupString[groupPosition], Toast.LENGTH_SHORT).show();
-            return false;
-        });
-        //设置子项布局监听
-        expandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
-          //  Toast.makeText(getActivity(), songListExtendableListViewAdapter.childString[groupPosition][childPosition], Toast.LENGTH_SHORT).show();
-            return true;
-
-        });
-
-
     }
 
     @Override

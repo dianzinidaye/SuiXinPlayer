@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.lifecycle.Observer;
 
 import com.example.suixinplayer.R;
+import com.example.suixinplayer.app.App;
 import com.example.suixinplayer.base.BaseActivity;
 import com.example.suixinplayer.bean.SongInMainActivityBean;
 import com.example.suixinplayer.liveDataBus.event.PlayEvet;
@@ -20,21 +21,18 @@ import com.example.suixinplayer.liveDataBus.event.UpDateUI;
 import com.example.suixinplayer.service.MusicPlayService;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
-import java.util.Observable;
-
 
 public class PlayActivity extends BaseActivity implements View.OnClickListener {
     private ImageView stop_play;
     private ImageView pre;
     private ImageView next;
     String TAG = "TAG";
-    // boolean isPlaying = false;
     boolean isLoveSong;
     private ImageView back;
     private PlayEvet playEvet;
     private MusicPlayService.MyBinder binder;
     private TextView songName, author;
-    private SongInMainActivityBean mSongInMainActivityBean;
+    //private SongInMainActivityBean mSongInMainActivityBean;
     private Observer<UpDateUI> observer;
 
 
@@ -64,9 +62,9 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected void initView() {
-        Intent intent = getIntent();
-        mSongInMainActivityBean = (SongInMainActivityBean) intent.getSerializableExtra("FMainActivity");
-        playEvet = mSongInMainActivityBean.playList.get(mSongInMainActivityBean.position);
+       // Intent intent = getIntent();
+       // mSongInMainActivityBean = (SongInMainActivityBean) intent.getSerializableExtra("FMainActivity");
+       // playEvet = mSongInMainActivityBean.playList.get(mSongInMainActivityBean.position);
         stop_play = findViewById(R.id.stop_play);
         pre = findViewById(R.id.pre);
         next = findViewById(R.id.next);
@@ -88,9 +86,10 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
 
     private void updateUi() {
         observer = upDateUI -> {
-           songName.setText(upDateUI.songName);
-           author.setText(upDateUI.author);
-       };
+            songName.setText(upDateUI.songName);
+            author.setText(upDateUI.author);
+            stop_play.setImageResource(R.drawable.ic_pause_60dp);
+        };
         LiveEventBus.get("UpDateUI", UpDateUI.class).observeStickyForever(observer);
     }
 
@@ -124,9 +123,10 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
                 finish();
                 break;
             case R.id.pre:
-                if (mSongInMainActivityBean.position >0) {
-                    mSongInMainActivityBean.position = --mSongInMainActivityBean.position;
-                    binder.hash2Url(mSongInMainActivityBean.playList.get(mSongInMainActivityBean.position));
+                if (App.songInMainActivityBean.position > 0) {
+                    App.songInMainActivityBean.position -= 1;
+                    binder.hash2Url(App.songInMainActivityBean.playList.get(App.songInMainActivityBean.position));
+
                 }
                 Log.i(TAG, "onClick: pre");
                 break;
@@ -141,9 +141,9 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.next:
                 Log.i(TAG, "onClick: next");
-                if (mSongInMainActivityBean.position < mSongInMainActivityBean.playList.size()) {
-                    mSongInMainActivityBean.position = ++mSongInMainActivityBean.position;
-                    binder.hash2Url(mSongInMainActivityBean.playList.get(mSongInMainActivityBean.position));
+                if (  App.songInMainActivityBean.position < App.songInMainActivityBean.playList.size()-1) {
+                    App.songInMainActivityBean.position += 1;
+                    binder.hash2Url(App.songInMainActivityBean.playList.get(App.songInMainActivityBean.position));
                 }
 
                 break;
