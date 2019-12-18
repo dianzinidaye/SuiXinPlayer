@@ -74,7 +74,6 @@ public class SearchRecyclerVierAdapter extends RecyclerView.Adapter<SearchRecycl
                     popupWindowSongList.showAtLocation(popRootView, Gravity.BOTTOM, 0, 0);
 
 
-                    // popupWindowSongList.showAsDropDown(view,0,0);
                 });
 
     }

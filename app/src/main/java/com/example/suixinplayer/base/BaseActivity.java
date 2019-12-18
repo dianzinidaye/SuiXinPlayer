@@ -25,28 +25,28 @@ public abstract class BaseActivity extends AppCompatActivity {
       //  setStatusBarColor(statusBarColor);
 
        //设置状态栏颜色
-       Window window = getWindow();
+      // Window window = getWindow();
        // window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        window.setStatusBarColor(getResources().getColor(R.color.search_button));
+      //  window.setStatusBarColor(getResources().getColor(R.color.search_button));
         setContentView(getLayoutResId());
   /*      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(getResources().getColor(R.color.colorAccent));
         }*/
-            ButterKnife.bind(this);
+          //  ButterKnife.bind(this);
         App.mActivityManager.attach(this);
         initView();
         initData();
 
     }
 
-    public void setStatusBarColor(int statusBarColorID) {
+/*    public void setStatusBarColor(int statusBarColorID) {
         //设置状态栏颜色
         Window window = getWindow();
         // window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         window.setStatusBarColor(statusBarColorID);
-    }
+    }*/
 
     protected abstract int getLayoutResId();
     protected void initView(){

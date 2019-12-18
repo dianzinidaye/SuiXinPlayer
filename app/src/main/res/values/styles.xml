@@ -17,11 +17,21 @@
     </style>
 
     <style name="Fragment" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/search_button</item>
         <!--状态栏颜色-->
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/search_button</item>
         <!--控制各个控件被选中时的颜色-->
-        <item name="colorAccent">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/search_button</item>
+    </style>
+<!--
+搜索页面的styles
+-->
+    <style name="SearchActivity" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/search_button</item>
+        <!--状态栏颜色-->
+        <item name="colorPrimaryDark">@color/white</item>
+        <!--控制各个控件被选中时的颜色-->
+        <item name="colorAccent">@color/line</item>
     </style>
 
     <style name="ApplicationTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
@@ -38,6 +48,20 @@ popupWindow动画的style
     <style name="popwin_anim_style" parent="android:Animation">
         <item name="android:windowEnterAnimation">@anim/pop_enter_anim</item>
         <item name="android:windowExitAnimation">@anim/pop_exit_anim</item>
+    </style>
+
+
+    <!--
+
+    全屏style-->
+    <style name="AppTheme_Translate" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
 

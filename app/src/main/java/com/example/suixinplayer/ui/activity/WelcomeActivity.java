@@ -1,6 +1,7 @@
 package com.example.suixinplayer.ui.activity;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -24,11 +25,13 @@ public class WelcomeActivity extends BaseActivity implements ViewPropertyAnimato
 
     @Override
     protected int getLayoutResId() {
+        Log.i("TAGG", "getLayoutResId: ");
         return R.layout.activity_welcome;
     }
 
     @Override
     protected void initView() {
+        Log.i("TAGG", "initView:WelcomeActivity ");
          ViewCompat.animate(imgViewWelcomeActivity).scaleY(1.0f)
                  .scaleX(1.0f)
                  .setListener(this)
@@ -43,6 +46,7 @@ public class WelcomeActivity extends BaseActivity implements ViewPropertyAnimato
 
     @Override
     public void onAnimationEnd(View view) {
+        Log.i("TAGG", "onAnimationEnd: ");
         Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
         startActivity(intent);
     }

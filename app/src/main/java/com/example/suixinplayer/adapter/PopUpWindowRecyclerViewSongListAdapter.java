@@ -19,6 +19,7 @@ import com.example.suixinplayer.db.DBUtil;
 import com.example.suixinplayer.db.SongDB;
 import com.example.suixinplayer.liveDataBus.event.AddSong;
 import com.example.suixinplayer.liveDataBus.event.CanclePupUpWdEvent;
+import com.example.suixinplayer.liveDataBus.event.PlayEvet;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class PopUpWindowRecyclerViewSongListAdapter extends RecyclerView.Adapter
             @Override
             public void onClick(View v) {
                 //Log.i("TAG", "onClick: 您选择了" + list.get(position));
-                SQLiteDatabase db = DBUtil.getDatabase(mContext);
+               /* SQLiteDatabase db = DBUtil.getDatabase(mContext);
                 SongDB songDB = new SongDB();
                 songDB.setSongName(infoBean.getSongname());
                 if (infoBean.getTrans_param().getHash_offset() != null) {
@@ -73,14 +74,21 @@ public class PopUpWindowRecyclerViewSongListAdapter extends RecyclerView.Adapter
                     songDB.setIs_free_part(0);
                 }
                 songDB.setAuthor(infoBean.getSingername());
-                songDB.setHash(infoBean.getHash());
-                DBUtil.insert(db, list.get(position), songDB);
+                songDB.setHash(infoBean.getHash());*/
+                Log.i("TAG", "歌单列表  添加歌曲到列表 ");
+                PlayEvet playEvet = new PlayEvet();
+                playEvet.hash = infoBean.getHash();
+                playEvet.songName = infoBean.getSongname();
+                playEvet.author = infoBean.getSingername();
+                if (infoBean.getTrans_param().getHash_offset() != null) {
+                    playEvet.isFree = 1;
+                } else {
+                    playEvet.isFree = 0;
+                }
+
+                DBUtil.addDate2Table(mContext,playEvet,list.get(position));
                 popUpWindow.dismiss();
                 LiveEventBus.get("ADDSONG", AddSong.class).post(new AddSong());
-               /* LiveEventBus
-                        .get("CanclePUW")
-                        .post(new CanclePupUpWdEvent(1));*/
-
             }
         });
     }

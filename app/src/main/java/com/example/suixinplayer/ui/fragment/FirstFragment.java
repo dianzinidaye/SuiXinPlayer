@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.example.suixinplayer.R;
 import com.example.suixinplayer.adapter.SongListExtendableListViewAdapter;
 import com.example.suixinplayer.liveDataBus.event.AddSong;
+import com.example.suixinplayer.uitli.CommandUtil;
 import com.example.suixinplayer.widget.CustomBaseDialog;
 import com.example.suixinplayer.widget.SongListExpandableListView;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -27,7 +28,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
  */
 public class FirstFragment extends Fragment {
 
-   private String TAG = "TAG";
+    private String TAG = "TAG";
     private SongListExpandableListView expandableListView;
     private SongListExtendableListViewAdapter songListExtendableListViewAdapter;
 
@@ -41,23 +42,23 @@ public class FirstFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        Log.i(TAG, "onCreateView: ");
+       // Log.i(TAG, "onCreateView: ");
         return inflater.inflate(R.layout.fragment_first, container, false);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-       // Log.i(TAG, "onActivityCreated:1 ");
+        // Log.i(TAG, "onActivityCreated:1 ");
         super.onActivityCreated(savedInstanceState);
-        Log.i(TAG, "FirstFragment onActivityCreated:  "+R.id.textView);
+        //Log.i(TAG, "FirstFragment onActivityCreated:  " + R.id.textView);
         expandableListView = getView().findViewById(R.id.expandable_listView);
-         songListExtendableListViewAdapter = new SongListExtendableListViewAdapter(getActivity());
+        songListExtendableListViewAdapter = new SongListExtendableListViewAdapter(getActivity());
         expandableListView.setAdapter(songListExtendableListViewAdapter);
     }
 
     @Override
     public void onDestroy() {
-        Log.i(TAG, "onDestroy ");
+       // Log.i(TAG, "onDestroy ");
         super.onDestroy();
 
     }

@@ -83,5 +83,9 @@ dependencies {
     //picasso 图片加载框架
     implementation 'com.squareup.picasso:picasso:2.71828'
 
+    //歌词显示
+    implementation 'me.wcy:lrcview:2.1.2'
 
+    //搜索历史标签式显示
+    implementation 'com.google.android:flexbox:2.0.0'
 }

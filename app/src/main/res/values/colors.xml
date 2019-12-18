@@ -6,11 +6,17 @@
     <color name="search_button">#7CCD7C</color>
 <!--pobupwindow-->
     <color name="line_default">#1E000000</color>
-    <color name="white">#ffffffff</color>
+    <color name="white">#FFFFFF</color>
     <color name="gray">#FFFAFA</color>
     <color name="press">#CFCFCF</color>
     <color name="edging">#C2C2C2</color>
     <color name="playactivitytop">#F666</color>
+    <color name="highTextColor">#038939</color>
+    <color name="line">#000000</color>
+
+
+
+    <color name="transparent">#00FFFFFF</color>
 
 
 </resources>

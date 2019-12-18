@@ -44,15 +44,16 @@ import com.example.suixinplayer.callback.PopRecyclerViewSelectOnclickListener;
 import com.example.suixinplayer.callback.ViewPageSelectCallback;
 import com.example.suixinplayer.db.DBUtil;
 import com.example.suixinplayer.listener.ViewPagerOnPageChangeListener;
+import com.example.suixinplayer.liveDataBus.event.PlayEvet;
 import com.example.suixinplayer.liveDataBus.event.UpDateUI;
 import com.example.suixinplayer.service.MusicPlayService;
-import com.example.suixinplayer.ui.search.SearchFragment;
 import com.example.suixinplayer.uitli.PermissionUtil;
 import com.example.suixinplayer.uitli.SharPUtil;
 import com.example.suixinplayer.widget.MyCircleImageView;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.roughike.bottombar.BottomBar;
 import com.squareup.picasso.Picasso;
+
 
 import static android.view.animation.Animation.INFINITE;
 
@@ -74,10 +75,10 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
     private ConstraintLayout mConstraintLayout;
     private TextView songName, author;
     private Observer<UpDateUI> observer;
-    private PopupWindow popupWindowSongList;
+    private PopupWindow popupWindow;
     private RecyclerView recyclerView;
     private int position = 0;
-    private PopUpWindowRecyclerViewPresentListAdapter adapter ;
+    private PopUpWindowRecyclerViewPresentListAdapter adapter;
     private View popRootView;
     private final int UPDATE = 121;
     private ObjectAnimator animator;
@@ -90,13 +91,14 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
 
     @Override
     protected void initView() {
-        adapter = new PopUpWindowRecyclerViewPresentListAdapter(this, App.songInMainActivityBean, this);
+        adapter = new PopUpWindowRecyclerViewPresentListAdapter(this, App.playingListBean, this);
 
         //第一次进入程序会默认创建一个"我喜欢"的歌单
         if (!SharPUtil.contains(this, "IsFirst")) {
-            SQLiteDatabase db = DBUtil.getDatabase( this);
+            SQLiteDatabase db = DBUtil.getDatabase(this);
             DBUtil.createTable(db, "最近播放", this);
             DBUtil.createTable(db, "我喜欢", this);
+            // DBUtil.createTable(db, "默认列表", this);
             //用来判断是否是第一次进入程序
             SharPUtil.putBoolean(this, "IsFirst", false);
         }
@@ -114,7 +116,7 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
         songName = findViewById(R.id.textView5);
         author = findViewById(R.id.textView6);
         bottomBar.setDefaultTabPosition(0);
-
+        findViewById(R.id.profile_image).setOnClickListener(this);
 
     }
 
@@ -130,7 +132,26 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
                 binder = (MusicPlayService.MyBinder) service;
                 MediaPlayer mediaPlayer = binder.getMediaPlayer();
                 mediaPlayer.setOnBufferingUpdateListener(MainActivity.this);
+                seekBar.setMax(binder.getDuration());
+                Log.d("TAG", "onPrepared: 播放  主线程" + binder.getDuration());
                 handler.sendEmptyMessage(UPDATE);
+
+                /*
+                 * 重启程序,恢复上次最后播放的歌曲
+                 * */
+                PlayEvet playEvet = DBUtil.querLast(DBUtil.getDatabase(MainActivity.this), "最近播放");
+                playEvet.isPrepare = true;
+                LiveEventBus.get("Play", PlayEvet.class)
+                        .post(playEvet);
+                //songName.setText(playEvet.songName);
+                // author.setText(playEvet.author);
+                //   Log.i("TAG", "onChanged:  不空" + upDateUI.duration);
+                //   play_or_Stop.setImageResource(R.drawable.ic_mainactivity_stop);
+                // mCircleImageView.startAnimation(rotateAnimation);
+                //  animator.start();
+                // adapter.notifyDataSetChanged();
+
+
             }
 
             @Override
@@ -165,10 +186,10 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
 
 
         /*
-        * 设置圆图的动画
-        * */
-        animator =  ObjectAnimator.ofFloat(mCircleImageView, "rotation", 0f, 360.0f);
-        animator.setRepeatCount( INFINITE);   //不断重复
+         * 设置圆图的动画
+         * */
+        animator = ObjectAnimator.ofFloat(mCircleImageView, "rotation", 0f, 360.0f);
+        animator.setRepeatCount(INFINITE);   //不断重复
         //animator.setRepeatMode(RESTART);  默认就是restart
         animator.setInterpolator(new LinearInterpolator());
         animator.setDuration(20000);
@@ -240,6 +261,10 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
      * */
     @Override
     public void onBackPressed() {
+        if (popupWindow != null && popupWindow.isShowing()) {
+            popupWindow.dismiss();
+            return;
+        }
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(previousFragment);
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction().remove(fragment).commitNow();
@@ -251,7 +276,7 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
     protected void onResume() {
         super.onResume();
         if (binder != null) {
-            Log.i("TAG", "onResume:  不空");
+            //  Log.i("TAG", "onResume:  不空");
             if (binder.getPlayState()) {
                 play_or_Stop.setImageResource(R.drawable.ic_mainactivity_stop);
             } else {
@@ -270,50 +295,46 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_search:
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.mainlayout, new SearchFragment(), previousFragment).commitNow();
+                startActivity(new Intent(this, SearchActivity.class));
                 break;
-            case R.id.imageButton_playOrStop:
 
+            case R.id.imageButton_playOrStop:
                 if (binder.getPlayState()) {
+                    binder.puase();
                     play_or_Stop.setImageResource(R.drawable.ic_mainactivity_play);
-                    binder.getMediaPlayer().pause();
-                   // mCircleImageView.clearAnimation();
-                    animator.pause();
                 } else {
+                    binder.continuePlay();
                     play_or_Stop.setImageResource(R.drawable.ic_mainactivity_stop);
-                    binder.getMediaPlayer().start();
-                   // mCircleImageView.startAnimation(rotateAnimation);
-                    animator.resume();
                 }
 
                 break;
+
             case R.id.imageButtonplay_list:
-                if (popupWindowSongList == null) {
+                if (popupWindow == null) {
                     LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                     popRootView = inflater.inflate(R.layout.popupwindow_songlist, null, false);//引入弹窗布局
                     // PopUpWindow 传入 ContentView
                     int height = this.getResources().getDisplayMetrics().heightPixels;
-                    popupWindowSongList = new PopupWindow(popRootView, ViewGroup.LayoutParams.MATCH_PARENT, height / 5 * 3);
-                    popupWindowSongList.setTouchable(true);
+                    popupWindow = new PopupWindow(popRootView, ViewGroup.LayoutParams.MATCH_PARENT, height / 5 * 3);
+                    popupWindow.setTouchable(true);
                     LinearLayoutManager layoutManager = new LinearLayoutManager(popRootView.getContext());
 
                     recyclerView = popRootView.findViewById(R.id.recyclerView);
                     recyclerView.setLayoutManager(layoutManager);
                     recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-                    recyclerView.swapAdapter(adapter, false);
+                    recyclerView.setAdapter(adapter);
 
                     // 设置背景
-                    popupWindowSongList.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                    popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
 
                     // 外部点击事件
-                    popupWindowSongList.setOutsideTouchable(true);
-                    popupWindowSongList.setAnimationStyle(R.style.popwin_anim_style);
-                    popupWindowSongList.showAtLocation(popRootView, Gravity.BOTTOM, 0, 0);
+                    popupWindow.setOutsideTouchable(true);
+                    popupWindow.setAnimationStyle(R.style.popwin_anim_style);
+                    popupWindow.showAtLocation(popRootView, Gravity.BOTTOM, 0, 0);
                     recyclerView.scrollToPosition(position + 1);
                     // recyclerView.findViewHolderForAdapterPosition(position).itemView.setBackgroundColor(Color.RED);
                 } else {
-                    popupWindowSongList.showAtLocation(popRootView, Gravity.BOTTOM, 0, 0);
+                    popupWindow.showAtLocation(popRootView, Gravity.BOTTOM, 0, 0);
                     adapter.notifyDataSetChanged();
                 }
                 break;
@@ -321,28 +342,53 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
                 Intent intent = new Intent(this, PlayActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.profile_image:
+                Log.i("TAG", "onClick: profile_image");
+                //DBUtil.delete(DBUtil.getDatabase(this), "最近播放", "635090888ee12e56c94ece803c41b8c8");
+                break;
         }
 
     }
 
     private void updateUi() {
         observer = upDateUI -> {
-            if (upDateUI.imaUri!=null){
-                Picasso.get().load(upDateUI.imaUri).into(mCircleImageView);
-          //  mCircleImageView.setImageBitmap();
-            }else {
-                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.love);
-                mCircleImageView.setImageBitmap(bitmap);
+            if (upDateUI.isPlaying.equals("仅播放")) {
+                //  Log.i("TAG", "updateUi: 仅播放");
+                play_or_Stop.setImageResource(R.drawable.ic_mainactivity_stop);
+                if (animator.isPaused()) {
+                    animator.resume();
+                } else {
+                    animator.start();
+                }
+            } else if (upDateUI.isPlaying.equals("仅暂停")) {
+                // Log.i("TAG", "updateUi: 仅暂停");
+                play_or_Stop.setImageResource(R.drawable.ic_mainactivity_play);
+                animator.pause();
+            } else {
+
+                //  Log.i("TAG", "updateUi: 暂停或者播放");
+                if (upDateUI.imaUri != null) {
+                    Picasso.get().load(upDateUI.imaUri).into(mCircleImageView);
+                    //  mCircleImageView.setImageBitmap();
+                } else {
+                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.love);
+                    mCircleImageView.setImageBitmap(bitmap);
+                }
+                songName.setText(upDateUI.songName);
+                author.setText(upDateUI.author);
+                Log.i("TAG", "onChanged:  不空" + upDateUI.duration);
+                // mCircleImageView.startAnimation(rotateAnimation);
+                seekBar.setMax(upDateUI.duration);
+                if (!upDateUI.isPrepar) {
+                    play_or_Stop.setImageResource(R.drawable.ic_mainactivity_stop);
+                    animator.start();
+                    adapter.notifyDataSetChanged();
+                } else {
+                    play_or_Stop.setImageResource(R.drawable.ic_mainactivity_play);
+                }
             }
-            songName.setText(upDateUI.songName);
-            author.setText(upDateUI.author);
-            Log.i("TAG", "onChanged:  不空" + upDateUI.duration);
-            play_or_Stop.setImageResource(R.drawable.ic_mainactivity_stop);
-           // mCircleImageView.startAnimation(rotateAnimation);
-            animator.start();
-            adapter.notifyDataSetChanged();
-            seekBar.setMax(upDateUI.duration);
         };
+
         LiveEventBus.get("UpDateUI", UpDateUI.class).observeStickyForever(observer);
     }
 
@@ -352,13 +398,13 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
     @Override
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
         seekBar.setSecondaryProgress(percent * seekBar.getMax());
-
+        Log.i("TAG", "onBufferingUpdate: MainActivity  ");
     }
 
 
     @Override
     public void deal(int position, View v) {
-        App.songInMainActivityBean.position = position;
+        App.playingListBean.position = position;
         this.position = position;
         adapter.notifyDataSetChanged();
     }
@@ -372,7 +418,7 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
             super.handleMessage(msg);
             if (msg.what == UPDATE) {
                 seekBar.setProgress(binder.getMediaPlayer().getCurrentPosition());
-                Log.i("TAG", "handleMessage: "+binder.getMediaPlayer().getCurrentPosition()+"  "+seekBar.getMax());
+                //   Log.i("TAG", "handleMessage: " + binder.getMediaPlayer().getCurrentPosition() + "  " + seekBar.getMax());
 
             }
             handler.sendEmptyMessageDelayed(UPDATE, 500);

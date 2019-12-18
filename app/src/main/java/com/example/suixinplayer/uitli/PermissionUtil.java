@@ -49,5 +49,11 @@ public class PermissionUtil {
                         }
                     });
         }
+/*
+* 检查是否有通知栏权限,,没有则跳转到通知设置界面
+* */
+        if (!NotificationPermissUtil.isPermissionOpen(context)){
+            NotificationPermissUtil. openPermissionSetting(context);
+        }
     }
 }

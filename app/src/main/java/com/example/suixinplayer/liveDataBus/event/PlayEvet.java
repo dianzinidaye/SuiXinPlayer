@@ -9,4 +9,8 @@ public class PlayEvet implements Serializable {
     public String hash ;
     public String songName;
     public String author;
+    public boolean isPrepare = false;
+    public boolean isLocal = false;
+    public String url;
+
 }

@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 
 /**
  * SharedPreferences
+ *
+ * 该项目没有用到
  */
 public class SharedPreferencesMgr {
 

@@ -8,6 +8,15 @@ public class SongDB  {
     private String author;
     private int is_free_part;      //1收费,0免费
     private String hash;
+    private String localUrl;
+
+    public String getLocalUrl() {
+        return localUrl;
+    }
+
+    public void setLocalUrl(String localUrl) {
+        this.localUrl = localUrl;
+    }
 
     public String getHash() {
         return hash;

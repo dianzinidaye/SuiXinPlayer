@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
- * 长按查询列表的弹窗ListView的Adapter
+ * FirstFragment 歌单列表ListView的Adapter
  * */
 public class SongListRecyclerVierAdapter extends RecyclerView.Adapter<SongListRecyclerVierAdapter.VH> {
 
@@ -41,14 +41,14 @@ public class SongListRecyclerVierAdapter extends RecyclerView.Adapter<SongListRe
     private PopupWindow popupWindow;
     private View view;
     private Context mContext;
-    private  SongDB mSongDB = new SongDB();
+    private String playListName;
 
 
-    public SongListRecyclerVierAdapter(List<PlayEvet> list, Context context,PopupWindow popupWindow) {
+    public SongListRecyclerVierAdapter(List<PlayEvet> list, Context context,PopupWindow popupWindow,String playListName) {
         this.list = list;
         mContext = context;
         this.popupWindow = popupWindow;
-
+        this.playListName = playListName;
     }
 
 
@@ -96,34 +96,27 @@ public class SongListRecyclerVierAdapter extends RecyclerView.Adapter<SongListRe
             @Override
             public void onClick(View v) {
                 //播放音乐
-                Log.i("TAG", "onClick: 播放音乐");
-                //代码的公共部分
+               // Log.i("TAG", "onClick: 播放音乐");
                 LiveEventBus.get("Play", PlayEvet.class)
                         .post(list.get(position));
+                Log.i("TAG", "onClick: "+App.playingListName+"    "+playListName);
+                if (!App.playingListName.equals(playListName)){
+                    Log.i("TAG", "两个列表不同");
+                    App.playingListBean.setPlayList(list);//设置当前
+                }else {
+                    Log.i("TAG", "两个列表相同");
+                }
+                App.playingListBean.setPosition(position);//设置当前的播放位置
 
-                mSongDB.setHash(list.get(position).hash);
-                mSongDB.setAuthor(list.get(position).author);
-                mSongDB.setIs_free_part(list.get(position).isFree);
-                mSongDB.setSongName(list.get(position).songName);
-                App.songInMainActivityBean.playList.add(list.get(position));
-                DBUtil.insert(DBUtil.getDatabase(mContext), "最近播放", mSongDB);
+                //播放历史
+                App.addSong2History(list.get(position));
+                DBUtil.historyAddDate(mContext, list.get(position));
                 popupWindow.dismiss();
 
             }
         });
 
 
-        /*
-         * 获取点击时的坐标,用作绘制弹窗
-         * */
-/*        holder.linearLayout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                x = event.getRawX();
-                y = event.getRawY();
-                return false;
-            }
-        });*/
 
 
 
@@ -134,7 +127,7 @@ public class SongListRecyclerVierAdapter extends RecyclerView.Adapter<SongListRe
 
             @Override
             public boolean onLongClick(View v) {
-
+          //  DBUtil.delete(DBUtil.getDatabase(mContext), );
 
 
                 return true;

@@ -141,7 +141,7 @@
         android:id="@+id/linearLayout_top"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/colorAccent"
+        android:background="@color/search_button"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -151,7 +151,7 @@
             android:id="@+id/bottomBar"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            app:bb_badgeBackgroundColor="@color/colorAccent"
+            app:bb_badgeBackgroundColor="@color/search_button"
             app:bb_behavior="shifting"
             app:bb_tabXmlResource="@xml/bottombar_menu" />
 

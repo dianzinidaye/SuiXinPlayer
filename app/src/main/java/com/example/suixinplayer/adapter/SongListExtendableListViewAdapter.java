@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.suixinplayer.R;
+import com.example.suixinplayer.app.App;
 import com.example.suixinplayer.bean.ChildItemBean;
 import com.example.suixinplayer.db.DBUtil;
 import com.example.suixinplayer.liveDataBus.event.AddSong;
@@ -44,7 +45,7 @@ import java.util.List;
 import static com.example.suixinplayer.app.App.context;
 
 public class SongListExtendableListViewAdapter extends BaseExpandableListAdapter {
-    private Context mContext;
+    private Activity mContext;
     public String[] groupString = {"我的歌单"};
     public String[] ssss = {"我的歌单","1","2","3","4","5","6","1","2","3","4","5","6","1","2","3","4","5","6","1","2","3","4","5","6","1","2","3","4","5","6","1","2","3","4","5","6"};
 
@@ -56,7 +57,7 @@ public class SongListExtendableListViewAdapter extends BaseExpandableListAdapter
 
    private List<ChildItemBean> childItemBeansList = new ArrayList<>();
     private AlertDialog.Builder builder;
-    private PopupWindow popupWindowSongList;
+    private PopupWindow popupWindow;
 
     public SongListExtendableListViewAdapter(Activity context) {
         mContext = context;
@@ -64,7 +65,7 @@ public class SongListExtendableListViewAdapter extends BaseExpandableListAdapter
         LiveEventBus.get("ADDSONG", AddSong.class).observeStickyForever(new Observer<AddSong>() {
             @Override
             public void onChanged(AddSong s) {
-              //  Log.i("TAG", "onChanged: 收到了更新通知");
+                Log.i("TAG", "FirstFragment  onChanged: 收到了更新通知");
                 initSongListDate();
                notifyDataSetChanged();
 
@@ -80,6 +81,7 @@ public class SongListExtendableListViewAdapter extends BaseExpandableListAdapter
         List<Integer> countList = query(list);
         for (int i =0;i<list.size();i++){
             ChildItemBean childItemBean = new ChildItemBean();
+            Log.i("TAG", "FirstFragment   "+countList.get(i));
             childItemBean.setTv_sheet_song_total(countList.get(i));
             childItemBean.setTv_song_sheet(list.get(i));
             childItemBeansList.add(childItemBean);
@@ -89,7 +91,9 @@ public class SongListExtendableListViewAdapter extends BaseExpandableListAdapter
 
     }
 
-
+    /*
+    * 查询获取各个歌单表的歌曲数目
+    * */
     private List<Integer>query(List<String> tableList){
         List<Integer> list = new ArrayList<>();
         for (String s:tableList) {
@@ -211,7 +215,7 @@ public class SongListExtendableListViewAdapter extends BaseExpandableListAdapter
         childViewHolder.iv_album.setImageResource(R.mipmap.love);
         childViewHolder.tv_song_sheet.setText(childItemBeansList.get(childPosition).getTv_song_sheet());
         String s = String.valueOf(childItemBeansList.get(childPosition).getTv_sheet_song_total());
-        childViewHolder.tv_sheet_song_total.setText(s);
+        childViewHolder.tv_sheet_song_total.setText("共"+s+"首歌");
 
         convertView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -225,6 +229,7 @@ public class SongListExtendableListViewAdapter extends BaseExpandableListAdapter
             public void onClick(View v) {
                 Log.i("TAG", "onActivityCreated: 点击了");
                 List<PlayEvet> list =  DBUtil.queryALL(DBUtil.getDatabase(mContext),childItemBeansList.get(childPosition).getTv_song_sheet());
+
   /*              final NormalListDialog dialog = new NormalListDialog(mContext,ssss);
                 dialog.title(childItemBeansList.get(childPosition).getTv_song_sheet())//
                         .titleTextSize_SP(18)//
@@ -247,20 +252,20 @@ public class SongListExtendableListViewAdapter extends BaseExpandableListAdapter
                 LayoutInflater inflater = (LayoutInflater) v.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View popRootView = inflater.inflate(R.layout.popupwindow_songlist, null, false);//引入弹窗布局
                 // PopUpWindow 传入 ContentView
-                popupWindowSongList = new PopupWindow(popRootView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                popupWindowSongList.setTouchable(true);
+                popupWindow = new PopupWindow(popRootView, ViewGroup.LayoutParams.MATCH_PARENT, CommandUtil.getRealHeight(mContext)/5*3);
+                popupWindow.setTouchable(true);
                 LinearLayoutManager layoutManager = new LinearLayoutManager(popRootView.getContext());
 
                 RecyclerView recyclerView = popRootView.findViewById(R.id.recyclerView);
                 recyclerView.setLayoutManager(layoutManager);
                 recyclerView.addItemDecoration(new DividerItemDecoration(v.getContext(), DividerItemDecoration.VERTICAL));
-                recyclerView.setAdapter(new SongListRecyclerVierAdapter(list,mContext,popupWindowSongList));
+                recyclerView.setAdapter(new SongListRecyclerVierAdapter(list,mContext,popupWindow,childItemBeansList.get(childPosition).getTv_song_sheet()));
                 // 设置背景
-                popupWindowSongList.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
 
                 // 外部点击事件
-                popupWindowSongList.setOutsideTouchable(true);
-                popupWindowSongList.showAtLocation(popRootView, Gravity.BOTTOM, 0, 0);
+                popupWindow.setOutsideTouchable(true);
+                popupWindow.showAtLocation(popRootView, Gravity.BOTTOM, 0, 0);
 
 
             }

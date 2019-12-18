@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
- * 歌单列表ListView的Adapter
+ * 首页和播放页面的默认播放列表ListView的Adapter
  * */
 public class PopUpWindowRecyclerViewPresentListAdapter extends RecyclerView.Adapter<PopUpWindowRecyclerViewPresentListAdapter.VH> {
     private Context mContext;
@@ -65,10 +65,10 @@ public class PopUpWindowRecyclerViewPresentListAdapter extends RecyclerView.Adap
 
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
-        holder.songName.setText(App.songInMainActivityBean.playList.get(position).songName);
-        holder.author.setText(App.songInMainActivityBean.playList.get(position).author);
-        Log.i("TAG", "onBindViewHolder: position"+position+"   "+App.songInMainActivityBean.position);
-        if (App.songInMainActivityBean.position==position){
+        holder.songName.setText(App.playingListBean.playList.get(position).songName);
+        holder.author.setText(App.playingListBean.playList.get(position).author);
+        Log.i("TAG", "onBindViewHolder: position"+position+"   "+App.playingListBean.position);
+        if (App.playingListBean.position==position){
             holder.songName.setTextColor(Color.BLUE);
             holder.author.setTextColor(Color.BLUE);
         }else {
@@ -82,22 +82,16 @@ public class PopUpWindowRecyclerViewPresentListAdapter extends RecyclerView.Adap
                 /*
                  * 播放操作
                  * */
-                Log.i("TAG", "onClick: 您选择了" + App.songInMainActivityBean.playList.get(position));
+                Log.i("TAG", "onClick: 您选择了"+position+"  " + App.playingListBean.playList.get(position));
                 LiveEventBus.get("Play", PlayEvet.class)
-                        .post(App.songInMainActivityBean.playList.get(position));
+                        .post(App.playingListBean.playList.get(position));
 
                 /*
                  * 数据库操作
                  * */
-                SQLiteDatabase db = DBUtil.getDatabase(mContext);
-                SongDB songDB = new SongDB();
-                songDB.setSongName(App.songInMainActivityBean.playList.get(position).songName);
-                songDB.setIs_free_part(App.songInMainActivityBean.playList.get(position).isFree);
-                songDB.setAuthor(App.songInMainActivityBean.playList.get(position).author);
-                songDB.setHash(App.songInMainActivityBean.playList.get(position).hash);
-                DBUtil.insert(db, "最近播放", songDB);
+              //  DBUtil.historyAddDate(mContext, App.playingListBean.playList.get(position));
                 popRecyclerViewSelectOnclickListener.deal(position, v);
-
+                App.playingListBean.setPosition(position);
             }
         });
 
@@ -113,6 +107,6 @@ public class PopUpWindowRecyclerViewPresentListAdapter extends RecyclerView.Adap
 
     @Override
     public int getItemCount() {
-        return App.songInMainActivityBean.playList.size();
+        return App.playingListBean.playList.size();
     }
 }

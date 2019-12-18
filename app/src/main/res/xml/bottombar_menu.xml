@@ -5,19 +5,19 @@
             id="@+id/tab_first"
             title="听"
             icon="@drawable/ic_bottombar_music_24dp"
-            barColorWhenSelected="@color/colorAccent"
+            barColorWhenSelected="@color/search_button"
             />
         <tab
             id="@+id/tab_second"
             title="看"
             icon="@drawable/ic_bottombar_music_24dp"
-            barColorWhenSelected="@color/colorAccent"
+            barColorWhenSelected="@color/search_button"
             />
         <tab
             id="@+id/tab_third"
             title="预留"
             icon="@drawable/ic_bottombar_music_24dp"
-            barColorWhenSelected="@color/colorAccent"
+            barColorWhenSelected="@color/search_button"
             />
 
     </tabs>
