@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <!--android:orderInCategory="50"
+    用来排序item,值越大越往后排
+    -->
+    <item
+        android:id="@+id/action_gallery"
+        android:title="相册"
+        android:orderInCategory="50"
+        android:icon="@android:drawable/ic_menu_gallery"
+        />
+    <item
+        android:id="@+id/action_details"
+        android:title="详情"
+        android:orderInCategory="50"
+        android:icon="@android:drawable/ic_menu_info_details"
+        />
+    <item
+        android:id="@+id/action_about"
+        android:title="关于"
+        android:orderInCategory="50"
+        android:icon="@android:drawable/ic_menu_help"
+        />
+    <item
+        android:id="@+id/action_music"
+        android:title="设置"
+        android:orderInCategory="50"
+        android:icon="@android:drawable/ic_menu_more"
+        >
+        <menu >
+
+            <item
+                android:id="@+id/action_play"
+                android:title="退出账号"
+                android:icon="@android:drawable/ic_media_play"/>
+            <item
+                android:id="@+id/action_pause"
+                android:title="退出程序"
+                android:icon="@android:drawable/ic_media_pause"/>
+        </menu>
+    </item>
+
+</menu>

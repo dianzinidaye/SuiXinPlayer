@@ -4,10 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.example.suixinplayer.liveDataBus.event.PlayEvet;
-import com.example.suixinplayer.uitli.SharPUtil;
+import com.example.suixinplayer.uit.SharPUtil;
 
 import java.io.File;
 import java.util.ArrayList;

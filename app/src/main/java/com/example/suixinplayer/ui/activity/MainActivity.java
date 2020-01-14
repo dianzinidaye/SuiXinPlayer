@@ -19,57 +19,68 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.ScaleAnimation;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.suixinplayer.R;
-import com.example.suixinplayer.adapter.MyFragmentPagerAdapter;
 import com.example.suixinplayer.adapter.PopUpWindowRecyclerViewPresentListAdapter;
 import com.example.suixinplayer.app.App;
 import com.example.suixinplayer.base.BaseActivity;
 import com.example.suixinplayer.callback.PopRecyclerViewSelectOnclickListener;
-import com.example.suixinplayer.callback.ViewPageSelectCallback;
 import com.example.suixinplayer.db.DBUtil;
-import com.example.suixinplayer.listener.ViewPagerOnPageChangeListener;
 import com.example.suixinplayer.liveDataBus.event.PlayEvet;
 import com.example.suixinplayer.liveDataBus.event.UpDateUI;
 import com.example.suixinplayer.service.MusicPlayService;
-import com.example.suixinplayer.uitli.PermissionUtil;
-import com.example.suixinplayer.uitli.SharPUtil;
+import com.example.suixinplayer.ui.fragment.FirstFragment;
+import com.example.suixinplayer.ui.fragment.SecondeFragment;
+import com.example.suixinplayer.ui.fragment.ThirdFragment;
+import com.example.suixinplayer.uit.PermissionUtil;
+import com.example.suixinplayer.uit.SharPUtil;
+import com.example.suixinplayer.uit.Download;
 import com.example.suixinplayer.widget.MyCircleImageView;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.jeremyliao.liveeventbus.LiveEventBus;
-import com.roughike.bottombar.BottomBar;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.view.animation.Animation.INFINITE;
 
 
-public class MainActivity extends BaseActivity implements ViewPageSelectCallback, View.OnClickListener, MediaPlayer.OnBufferingUpdateListener, PopRecyclerViewSelectOnclickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener, MediaPlayer.OnBufferingUpdateListener, PopRecyclerViewSelectOnclickListener {
 
     private MyCircleImageView mCircleImageView;
-    private ViewPager viewPager;
-    private MyFragmentPagerAdapter fragmentPagerAdapter;
-    private BottomBar bottomBar;
+    private ViewPager2 viewPager;
+    private String list[] = {"网络", "本地", "其他"};
     private ImageButton play_or_Stop;
     private MusicPlayService.MyBinder binder;
 
     //前一个fragment
     private String previousFragment = "previousFragment";
     private Button btn_search;
+    private TabLayout tabLayout;
     private ImageButton play_list;
     private SeekBar seekBar;
     private ConstraintLayout mConstraintLayout;
@@ -82,6 +93,19 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
     private View popRootView;
     private final int UPDATE = 121;
     private ObjectAnimator animator;
+    private List<Fragment> fragmentList;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+
+    public MainActivity() {
+        fragmentList = new ArrayList<>();
+        FirstFragment firstFragment = new FirstFragment();
+        SecondeFragment secondeFragment = new SecondeFragment();
+        ThirdFragment thirdFragment = new ThirdFragment();
+        fragmentList.add(firstFragment);
+        fragmentList.add(secondeFragment);
+        fragmentList.add(thirdFragment);
+    }
 
 
     @Override
@@ -106,8 +130,8 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
         // rxPermissionTest();
         PermissionUtil.rxPermissionTest(this);
         mCircleImageView = findViewById(R.id.profile_image);
+        tabLayout = findViewById(R.id.tabLayout);
         viewPager = findViewById(R.id.viewPager);
-        bottomBar = findViewById(R.id.bottomBar);
         play_or_Stop = findViewById(R.id.imageButton_playOrStop);
         btn_search = findViewById(R.id.btn_search);
         play_list = findViewById(R.id.imageButtonplay_list);
@@ -115,9 +139,13 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
         mConstraintLayout = findViewById(R.id.bottom);
         songName = findViewById(R.id.textView5);
         author = findViewById(R.id.textView6);
-        bottomBar.setDefaultTabPosition(0);
+        drawerLayout = findViewById(R.id.drawerLayout);
+        navigationView = findViewById(R.id.navigationView);
         findViewById(R.id.profile_image).setOnClickListener(this);
-
+        findViewById(R.id.menuImageView).setOnClickListener(this);
+        Download download = new Download();
+        download.tst("哈哈哈哈哈哈哈");
+        Log.i("TAG", "initView: "+download.getList().get(0));
     }
 
     @Override
@@ -171,13 +199,6 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
         LiveEventBus.get("UpDateUI", UpDateUI.class).post(upDateUI);*/
     }
 
-    /*
-     * viewpager翻页回调
-     * */
-    @Override
-    public void dealOnPageSelected(int position) {
-        bottomBar.selectTabAtPosition(position);
-    }
 
     /*
      * 设置viewPager和bottomBar
@@ -211,24 +232,107 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
         rotateAnimation.setInterpolator(new LinearInterpolator());
         rotateAnimation.setDuration(6000);
         //mCircleImageView.setAnimation(rotateAnimation);*/
-        fragmentPagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-        if (null != fragmentPagerAdapter) {
-            viewPager.setAdapter(fragmentPagerAdapter);
-        }
-        viewPager.addOnPageChangeListener(new ViewPagerOnPageChangeListener(fragmentPagerAdapter.fragmentList, viewPager, this));
-        bottomBar.setOnTabSelectListener(tabId -> {
-            switch (tabId) {
-                case R.id.tab_first:
-                    viewPager.setCurrentItem(0);
-                    break;
-                case R.id.tab_second:
-                    viewPager.setCurrentItem(1);
-                    break;
-                case R.id.tab_third:
-                    viewPager.setCurrentItem(2);
-                    break;
+
+
+        viewPager.setAdapter(new FragmentStateAdapter(this) {
+            @NonNull
+            @Override
+            public Fragment createFragment(int position) {
+                return fragmentList.get(position);
+            }
+
+            @Override
+            public int getItemCount() {
+                return fragmentList.size();
             }
         });
+
+        //将tabLayout与ViewPager关联起来,点击tabLayout,viewPager会翻页;viewPager翻页tabLayout会翻,
+        // tabLayout的tab数量会根据viewPager 的apater FragmentStateAdapter中的getItemCount的值产生
+        new TabLayoutMediator(tabLayout, viewPager, new TabLayoutMediator.TabConfigurationStrategy() {
+            @Override
+            public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
+      /*
+                switch (position) {
+                    case 0:
+                        tab.setText("网络");
+                        break;
+                    case 1:
+                        tab.setText("本地");
+                        break;
+                    case 2:
+                        tab.setText("其他");
+                        break;
+                }*/
+            }
+        }).attach();
+
+        //将自定义的view加载到各个tab
+        int tabCount = tabLayout.getTabCount();
+        for (int i = 0; i < tabCount; i++) {
+            TabLayout.Tab tab = tabLayout.getTabAt(i);
+            if (tab == null) return;
+            //设置自定义的View
+            View v = LayoutInflater.from(MainActivity.this).inflate(R.layout.item_tab, null);
+            TextView tv = v.findViewById(R.id.textView);
+            //默认选择第一个
+            if (i == 0) {
+                tv.setText(list[0]);
+                tv.setTextSize(22);
+                // 改变 tab 选择状态下的字体颜色
+                tv.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.white));
+            } else {
+                tv.setText(list[i]);
+                tv.setTextSize(18);
+                // 改变 tab 选择状态下的字体颜色
+                tv.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.playactivitytop));
+            }
+            tab.setCustomView(tv);
+        }
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                // 获取 tab中的view
+                View view = tab.getCustomView();
+
+                if (null != view) {
+                    Log.i("TAG", "onTabSelected: 选中 改变字体");
+                    // 改变 tab 选择状态下的字体大小
+                    ((TextView) view).setTextSize(22);
+                    // 改变 tab 选择状态下的字体颜色
+                    ((TextView) view).setTextColor(ContextCompat.getColor(MainActivity.this, R.color.white));
+
+                    //动画
+                    Animation scaleAnimation = new ScaleAnimation(0.818f, 1f, 0.818f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                    scaleAnimation.setDuration(300);
+                    view.startAnimation(scaleAnimation);
+
+                }
+
+                int position = tab.getPosition();
+                viewPager.setCurrentItem(position);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                View view = tab.getCustomView();
+                if (null != view) {
+                    // 改变 tab 选择状态下的字体大小
+                    ((TextView) view).setTextSize(18);
+                    // 改变 tab 选择状态下的字体颜色
+                    ((TextView) view).setTextColor(ContextCompat.getColor(MainActivity.this, R.color.playactivitytop));
+                }
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+            //添加头布局
+        View headview=navigationView.inflateHeaderView(R.layout.navigationview_header);
         play_or_Stop.setOnClickListener(this);
         btn_search.setOnClickListener(this);
         play_list.setOnClickListener(this);
@@ -265,6 +369,10 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
             popupWindow.dismiss();
             return;
         }
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return;
+        }
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(previousFragment);
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction().remove(fragment).commitNow();
@@ -296,6 +404,9 @@ public class MainActivity extends BaseActivity implements ViewPageSelectCallback
         switch (v.getId()) {
             case R.id.btn_search:
                 startActivity(new Intent(this, SearchActivity.class));
+                break;
+            case R.id.menuImageView:
+                drawerLayout.openDrawer(GravityCompat.START);
                 break;
 
             case R.id.imageButton_playOrStop:

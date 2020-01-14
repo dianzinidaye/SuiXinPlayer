@@ -1,14 +1,11 @@
-package com.example.suixinplayer.uitli;
+package com.example.suixinplayer.uit;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
 import android.os.Build;
 import android.widget.Toast;
 
 import androidx.fragment.app.FragmentActivity;
 
-import com.example.suixinplayer.ui.activity.MainActivity;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import io.reactivex.Observer;

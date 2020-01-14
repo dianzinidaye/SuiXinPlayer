@@ -1,18 +1,16 @@
-package com.example.suixinplayer.uitli;
+package com.example.suixinplayer.uit;
 
 import android.util.Log;
 
 import com.example.suixinplayer.bean.SongBean;
 import com.example.suixinplayer.bean.SongSearchForResultListBean;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

@@ -26,7 +26,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,7 +33,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.suixinplayer.R;
 import com.example.suixinplayer.adapter.PopUpWindowRecyclerViewPresentListAdapter;
-import com.example.suixinplayer.adapter.PopUpWindowRecyclerViewSongListAdapter;
 import com.example.suixinplayer.app.App;
 import com.example.suixinplayer.base.BaseActivity;
 import com.example.suixinplayer.callback.PopRecyclerViewSelectOnclickListener;
@@ -45,8 +43,8 @@ import com.example.suixinplayer.liveDataBus.event.PlayNextSongEvent;
 import com.example.suixinplayer.liveDataBus.event.PlayPreSongEvent;
 import com.example.suixinplayer.liveDataBus.event.UpDateUI;
 import com.example.suixinplayer.service.MusicPlayService;
-import com.example.suixinplayer.uitli.CommandUtil;
-import com.example.suixinplayer.uitli.GetLrcUtil;
+import com.example.suixinplayer.uit.CommandUtil;
+import com.example.suixinplayer.uit.GetLrcUtil;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.squareup.picasso.Picasso;
 

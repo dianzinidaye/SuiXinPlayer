@@ -1,4 +1,4 @@
-package com.example.suixinplayer.uitli;
+package com.example.suixinplayer.uit;
 
 import android.net.Uri;
 import android.util.Log;

@@ -16,9 +16,8 @@ import android.view.ViewGroup;
 
 import com.example.suixinplayer.R;
 import com.example.suixinplayer.adapter.LocalSongRcyViewAdapter;
-import com.example.suixinplayer.db.SongDB;
 import com.example.suixinplayer.liveDataBus.event.PlayEvet;
-import com.example.suixinplayer.uitli.LocalSongUtil;
+import com.example.suixinplayer.uit.LocalSongUtil;
 
 import java.util.List;
 

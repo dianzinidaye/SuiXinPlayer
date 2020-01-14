@@ -1,4 +1,4 @@
-package com.example.suixinplayer.uitli;
+package com.example.suixinplayer.uit;
 
 import android.graphics.Bitmap;
 import android.util.LruCache;

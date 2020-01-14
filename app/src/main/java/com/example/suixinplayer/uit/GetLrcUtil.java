@@ -1,12 +1,9 @@
-package com.example.suixinplayer.uitli;
+package com.example.suixinplayer.uit;
 
 import android.util.ArrayMap;
 import android.widget.ImageView;
 
 import com.example.suixinplayer.bean.LrcsBean;
-import com.example.suixinplayer.bean.SongBean;
-import com.example.suixinplayer.liveDataBus.event.PlayEvet;
-import com.example.suixinplayer.network.ApiSongDetailService;
 import com.example.suixinplayer.network.LrcApiService;
 import com.squareup.picasso.Picasso;
 

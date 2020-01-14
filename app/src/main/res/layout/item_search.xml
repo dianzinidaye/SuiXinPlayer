@@ -14,10 +14,10 @@
         <TextView
             android:id="@+id/tv_item_history_song"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="25dp"
             android:gravity="center_vertical"
             android:text="12313"
-            android:textSize="25dp"
+            android:textSize="20dp"
             android:textColor="@color/colorAccent"
             android:textStyle="normal"
             />

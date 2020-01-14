@@ -1,34 +1,11 @@
 package com.example.suixinplayer.ui.activity;
 
 
-import android.util.ArrayMap;
-import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
-
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 
 import com.example.suixinplayer.R;
-import com.example.suixinplayer.adapter.SearchRecyclerVierAdapter;
 import com.example.suixinplayer.base.BaseActivity;
-import com.example.suixinplayer.bean.SongSearchForResultListBean;
-import com.example.suixinplayer.liveDataBus.event.PlayEvet;
-import com.example.suixinplayer.network.ApiService;
-import com.example.suixinplayer.ui.search.SearchFragment;
-import com.example.suixinplayer.uitli.CommandUtil;
-import com.example.suixinplayer.uitli.HistorySearchUtil;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
+import com.example.suixinplayer.uit.CommandUtil;
 
 
 /**

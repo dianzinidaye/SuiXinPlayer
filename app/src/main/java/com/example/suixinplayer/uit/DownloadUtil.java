@@ -1,4 +1,4 @@
-package com.example.suixinplayer.uitli;
+package com.example.suixinplayer.uit;
 
 import com.example.suixinplayer.bean.DownloadSong;
 import java.io.File;

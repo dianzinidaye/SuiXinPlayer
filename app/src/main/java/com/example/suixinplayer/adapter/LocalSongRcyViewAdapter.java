@@ -52,8 +52,8 @@ public class LocalSongRcyViewAdapter extends RecyclerView.Adapter<LocalSongRcyVi
 
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
-        holder.songName.setText(list.get(position).songName);
-        holder.author.setText(list.get(position).author);
+        holder.songName.setText(list.get(position).songName.trim());
+        holder.author.setText(list.get(position).author.trim());
         holder.constraintLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

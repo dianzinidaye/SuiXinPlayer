@@ -1,19 +1,14 @@
-package com.example.suixinplayer.uitli;
+package com.example.suixinplayer.uit;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.media.MediaScannerConnection;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.example.suixinplayer.db.SongDB;
 import com.example.suixinplayer.liveDataBus.event.PlayEvet;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class LocalSongUtil {
     //定义一个集合，存放从本地读取到的内容

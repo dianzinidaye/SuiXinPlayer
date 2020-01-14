@@ -5,23 +5,14 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ExpandableListView;
-import android.widget.Toast;
 
 import com.example.suixinplayer.R;
 import com.example.suixinplayer.adapter.SongListExtendableListViewAdapter;
-import com.example.suixinplayer.liveDataBus.event.AddSong;
-import com.example.suixinplayer.uitli.CommandUtil;
-import com.example.suixinplayer.widget.CustomBaseDialog;
 import com.example.suixinplayer.widget.SongListExpandableListView;
-import com.jeremyliao.liveeventbus.LiveEventBus;
 
 /**
  * A simple {@link Fragment} subclass.

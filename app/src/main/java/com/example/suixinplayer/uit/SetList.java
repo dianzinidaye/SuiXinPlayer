@@ -1,4 +1,4 @@
-package com.example.suixinplayer.uitli;
+package com.example.suixinplayer.uit;
 
 import java.util.LinkedList;
 

@@ -1,10 +1,7 @@
-package com.example.suixinplayer.uitli;
+package com.example.suixinplayer.uit;
 
 import android.content.Context;
 import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class HistorySearchUtil {
     public static SetList<String> getSearchHistory(Context context) {

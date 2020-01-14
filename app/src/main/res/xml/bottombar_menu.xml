@@ -24,6 +24,8 @@
 </PreferenceScreen>
 
 <!--
+ icon="@drawable/ic_bottombar_music_24dp"
+
 <tab
 id="@+id/tab_friends"
 title="Friends"

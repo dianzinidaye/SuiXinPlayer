@@ -9,14 +9,8 @@ import com.example.suixinplayer.base.ActivityManager;
 import com.example.suixinplayer.bean.SongInMainActivityBean;
 import com.example.suixinplayer.db.DBUtil;
 import com.example.suixinplayer.liveDataBus.event.PlayEvet;
-import com.example.suixinplayer.other.videocache.HttpProxyCacheServer;
-import com.example.suixinplayer.uitli.AndroidVideoCacheFileNameGenerator;
-import com.example.suixinplayer.uitli.SharPUtil;
+import com.example.suixinplayer.uit.SharPUtil;
 import com.jeremyliao.liveeventbus.LiveEventBus;
-
-import org.litepal.LitePalApplication;
-
-import java.util.List;
 
 
 public class App extends Application {

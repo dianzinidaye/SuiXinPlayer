@@ -1,4 +1,4 @@
-package com.example.suixinplayer.uitli;
+package com.example.suixinplayer.uit;
 
 import android.app.NotificationManager;
 import android.content.Context;

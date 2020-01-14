@@ -9,7 +9,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
@@ -19,7 +18,6 @@ import android.os.IBinder;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.SeekBar;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -33,21 +31,14 @@ import com.example.suixinplayer.liveDataBus.event.ChangePlayModeEvent;
 import com.example.suixinplayer.liveDataBus.event.PlayEvet;
 import com.example.suixinplayer.liveDataBus.event.PlayNextSongEvent;
 import com.example.suixinplayer.liveDataBus.event.PlayPreSongEvent;
-import com.example.suixinplayer.liveDataBus.event.StopPlayEvent;
 import com.example.suixinplayer.liveDataBus.event.UpDateUI;
 import com.example.suixinplayer.network.ApiSongDetailService;
-import com.example.suixinplayer.other.videocache.CacheListener;
-import com.example.suixinplayer.ui.activity.PlayActivity;
-import com.example.suixinplayer.uitli.SharPUtil;
+import com.example.suixinplayer.uit.SharPUtil;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Observable;
-
-import javax.security.auth.login.LoginException;
 
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -76,12 +67,23 @@ public class MusicPlayService extends Service {
     private NotificationCompat.Builder builder;
     private Notification notification;
 
+
+    @Override
+    public void onCreate() {
+        Log.i("TAG", "onCreate: ");
+        super.onCreate();
+        manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        manager.notify(2, getNotification(manager));
+        startForeground(2, getNotification(manager));
+
+    }
+
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         Log.i("TAG", "onBind: ");
-        manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        manager.notify(2, getNotification(manager));
+
         return new MyBinder();
     }
 
@@ -324,13 +326,7 @@ public class MusicPlayService extends Service {
     }
 
 
-    @Override
-    public void onCreate() {
-        Log.i("TAG", "onCreate: ");
-        super.onCreate();
 
-
-    }
 
 
     public class MyBinder extends Binder {
@@ -443,7 +439,11 @@ public class MusicPlayService extends Service {
 
                     } else {
                         Log.i("TAG", "onChanged: 通知栏收到更新通知");
-                        remoteViews.setImageViewResource(R.id.notification_play_pause, R.mipmap.ic_pause);
+                        if (upDateUI.isPlaying.equals("播放")){
+                            remoteViews.setImageViewResource(R.id.notification_play_pause, R.mipmap.ic_pause);
+                        }else {
+                            remoteViews.setImageViewResource(R.id.notification_play_pause, R.mipmap.ic_play);
+                        }
                         remoteViews.setTextViewText(R.id.notification_song_name, upDateUI.songName);
                         remoteViews.setTextViewText(R.id.notification_author, upDateUI.author);
                         //Picasso会自动刷新notification
@@ -556,6 +556,9 @@ public class MusicPlayService extends Service {
         try {
             if (playEvet.hash == null && playEvet.isPrepare) {
                 return;    //第一次运行程序点击播放为null
+            }
+            if (url==null){
+                return;
             }
             Uri uri = Uri.parse(url);
             mMediaPlayer.setDataSource(getApplication(), uri);

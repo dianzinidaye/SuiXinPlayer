@@ -8,8 +8,6 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.Selection;
-import android.text.Spannable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,10 +16,8 @@ import android.widget.EditText;
 
 import com.example.suixinplayer.R;
 import com.example.suixinplayer.adapter.HistorySearchRcyViewAdapter;
-import com.example.suixinplayer.uitli.HistorySearchUtil;
+import com.example.suixinplayer.uit.HistorySearchUtil;
 import com.google.android.flexbox.FlexboxLayoutManager;
-
-import static com.example.suixinplayer.uitli.SongUrlUitl.getSongSearchForResultListBean;
 
 
 public class SearchHistoryFragment extends Fragment implements View.OnClickListener, HistorySearchRcyViewAdapter.RecycleViewOnclickListener {

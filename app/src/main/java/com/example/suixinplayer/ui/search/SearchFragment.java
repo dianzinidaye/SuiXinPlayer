@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,8 +27,8 @@ import com.example.suixinplayer.callback.HistoryRecyclerViewSelectOnclickListene
 import com.example.suixinplayer.db.DBUtil;
 import com.example.suixinplayer.liveDataBus.event.PlayEvet;
 import com.example.suixinplayer.network.ApiService;
-import com.example.suixinplayer.uitli.CommandUtil;
-import com.example.suixinplayer.uitli.HistorySearchUtil;
+import com.example.suixinplayer.uit.CommandUtil;
+import com.example.suixinplayer.uit.HistorySearchUtil;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.ArrayList;
@@ -65,10 +64,10 @@ public class SearchFragment extends Fragment implements HistoryRecyclerViewSelec
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        if (getArguments()!=null){
+        if (getArguments() != null) {
             searchString = getArguments().getString("KeyWorld");
-            Log.i("TAG", "SearchFragment onCreateView: "+searchString);
-        }else {
+            Log.i("TAG", "SearchFragment onCreateView: " + searchString);
+        } else {
             Log.i("TAG", "SearchFragment onCreateView: 为空");
         }
         return inflater.inflate(R.layout.fragment_search, container, false);
@@ -91,16 +90,6 @@ public class SearchFragment extends Fragment implements HistoryRecyclerViewSelec
                         HistorySearchUtil.addSearchHistory(getContext(), etv_search.getText().toString());
                         getSongSearchForResultListBean(etv_search.getText().toString());
                         CommandUtil.singleHideSoftKeyboard(getContext(), etv_search);
-                   /* if (isSearchHistoryFragment){
-                        Navigation.findNavController(SearchActivity.this,R.id.fragment).navigate(R.id.action_searchHistoryFragment_to_searchFragment);
-                        isSearchHistoryFragment = false;
-                        SearchFragment fragment = (SearchFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
-                        fragment.mSearchRecyclerVierAdapter.list = list;
-                    }*/
-                        //  Navigation.findNavController(v).navigate(R.id.action_searchHistoryFragment_to_searchFragment);
-
-
-                        // Navigation.createNavigateOnClickListener(R.id.action_searchHistoryFragment_to_searchFragment);
                     }
                     return true;
                 }
@@ -114,7 +103,7 @@ public class SearchFragment extends Fragment implements HistoryRecyclerViewSelec
         mSearchRecyclerVierAdapter = new SearchRecyclerVierAdapter(this, getActivity());
         mRecyclerView.setAdapter(mSearchRecyclerVierAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
-        if (!searchString.equals("")){
+        if (!searchString.equals("")) {
             getSongSearchForResultListBean(etv_search.getText().toString());
         }
     }

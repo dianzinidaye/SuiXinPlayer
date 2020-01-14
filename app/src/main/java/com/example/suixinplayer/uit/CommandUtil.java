@@ -1,14 +1,9 @@
-package com.example.suixinplayer.uitli;
+package com.example.suixinplayer.uit;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
-import android.os.Build;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import java.text.SimpleDateFormat;
